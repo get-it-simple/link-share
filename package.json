@@ -5,7 +5,10 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"build": "npm run lint && vite build",
+		"lint": "eslint . --ext ts,tsx --max-warnings=0",
+		"lint:fix": "npm run lint -- --fix",
+		"format": "prettier \"src/**/*.{ts,tsx,css,md}\" --write",
 		"preview": "vite preview",
 		"predeploy": "npm run build",
 		"deploy": "npm run predeploy && npx gh-pages -d dist"
