@@ -51,7 +51,6 @@ type UseLinksApi = {
 
 export const useLinks = (): UseLinksState & UseLinksApi => {
 	const [items, setItems] = useState<LinkItem[]>(() => loadLinks());
-	const [hydrated, setHydrated] = useState(false);
 
 	const [search, setSearch] = useState('');
 	const [sortField, setSortField] = useState<SortField>('updatedAt');
@@ -65,13 +64,8 @@ export const useLinks = (): UseLinksState & UseLinksApi => {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		setHydrated(true);
-	}, []);
-
-	useEffect(() => {
-		if (!hydrated) return;
 		saveLinks(items);
-	}, [items, hydrated]);
+	}, [items]);
 
 	const setDraft = (updater: (prev: LinkDraft) => LinkDraft) => {
 		setDraftInner((prev) => updater(prev));

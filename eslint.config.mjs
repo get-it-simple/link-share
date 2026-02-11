@@ -1,0 +1,43 @@
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import globals from 'globals';
+
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+
+export default [
+	{
+		ignores: [
+			'dist',
+			'node_modules',
+			'tailwind.config.cjs',
+			'postcss.config.cjs',
+		],
+	},
+
+	js.configs.recommended,
+	...tseslint.configs.recommended,
+
+	{
+		files: ['**/*.{ts,tsx}'],
+
+		languageOptions: {
+			ecmaVersion: 2020,
+			sourceType: 'module',
+			globals: globals.browser,
+			parserOptions: {
+				project: false,
+			},
+		},
+
+		plugins: {
+			'react-hooks': reactHooks,
+			'react-refresh': reactRefresh,
+		},
+
+		rules: {
+			...reactHooks.configs['recommended-latest'].rules,
+			...reactRefresh.configs.vite.rules,
+		},
+	},
+];
