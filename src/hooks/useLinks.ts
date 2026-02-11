@@ -16,6 +16,11 @@ import {
 	uid,
 } from '../domain/linkUtils';
 import { loadLinks, saveLinks } from '../storage/linksStorage';
+import {
+	exportToJsonString,
+	importFromJsonString,
+	mergeById,
+} from './src/domain/linkCodec';
 
 type UseLinksState = {
 	items: LinkItem[];
@@ -40,10 +45,14 @@ type UseLinksApi = {
 	syncPreviews: () => void;
 	clearAll: () => void;
 	filteredSorted: LinkItem[];
+	exportJson: () => void;
+	importJsonFile: (file: File) => Promise<void>;
 };
 
 export const useLinks = (): UseLinksState & UseLinksApi => {
-	const [items, setItems] = useState<LinkItem[]>([]);
+	const [items, setItems] = useState<LinkItem[]>(() => loadLinks());
+	const [hydrated, setHydrated] = useState(false);
+
 	const [search, setSearch] = useState('');
 	const [sortField, setSortField] = useState<SortField>('updatedAt');
 	const [sortDir, setSortDir] = useState<SortDirection>('desc');
@@ -56,12 +65,13 @@ export const useLinks = (): UseLinksState & UseLinksApi => {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		setItems(loadLinks());
+		setHydrated(true);
 	}, []);
 
 	useEffect(() => {
+		if (!hydrated) return;
 		saveLinks(items);
-	}, [items]);
+	}, [items, hydrated]);
 
 	const setDraft = (updater: (prev: LinkDraft) => LinkDraft) => {
 		setDraftInner((prev) => updater(prev));
@@ -192,6 +202,32 @@ export const useLinks = (): UseLinksState & UseLinksApi => {
 		return base.sort((a, b) => compareLinks(a, b, sortField, sortDir));
 	}, [items, search, sortField, sortDir]);
 
+	const exportJson = () => {
+		const json = exportToJsonString(items);
+		const blob = new Blob([json], {
+			type: 'application/json;charset=utf-8',
+		});
+		const a = document.createElement('a');
+		const stamp = new Date().toISOString().replaceAll(':', '-');
+		a.href = URL.createObjectURL(blob);
+		a.download = `links-export-${stamp}.json`;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		URL.revokeObjectURL(a.href);
+	};
+
+	const importJsonFile = async (file: File) => {
+		const text = await file.text();
+		const { items: imported } = importFromJsonString(text);
+		if (imported.length === 0) {
+			setError('Файл імпорту не містить валідних записів.');
+			return;
+		}
+		setError(null);
+		setItems((prev) => mergeById(prev, imported));
+	};
+
 	return {
 		items,
 		search,
@@ -212,5 +248,7 @@ export const useLinks = (): UseLinksState & UseLinksApi => {
 		syncPreviews,
 		clearAll,
 		filteredSorted,
+		importJsonFile,
+		exportJson,
 	};
 };

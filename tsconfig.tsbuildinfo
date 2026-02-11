@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/domain/linktypes.ts","./src/domain/linkutils.ts","./src/hooks/uselinks.ts","./src/hooks/src/domain/linkcodec.ts","./src/storage/linksstorage.ts","./src/ui/badge.tsx","./src/ui/button.tsx","./src/ui/input.tsx","./src/ui/select.tsx","./src/ui/textarea.tsx"],"version":"5.9.3"}

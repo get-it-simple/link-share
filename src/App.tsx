@@ -29,9 +29,12 @@ export default function App() {
 		syncPreviews,
 		clearAll,
 		filteredSorted,
+		importJsonFile,
+		exportJson,
 	} = useLinks();
 
 	const urlRef = useRef<HTMLInputElement | null>(null);
+	const fileRef = useRef<HTMLInputElement | null>(null);
 
 	useEffect(() => {
 		setTimeout(() => urlRef.current?.focus(), 0);
@@ -72,6 +75,33 @@ export default function App() {
 							disabled={items.length === 0}
 						>
 							Очистити все
+						</Button>
+						<Button
+							variant='ghost'
+							onClick={exportJson}
+							disabled={items.length === 0}
+						>
+							Export
+						</Button>
+
+						<input
+							ref={fileRef}
+							type='file'
+							accept='application/json'
+							className='hidden'
+							onChange={async (e) => {
+								const f = e.target.files?.[0] ?? null;
+								e.target.value = '';
+								if (!f) return;
+								await importJsonFile(f);
+							}}
+						/>
+
+						<Button
+							variant='ghost'
+							onClick={() => fileRef.current?.click()}
+						>
+							Import
 						</Button>
 					</div>
 				</div>
