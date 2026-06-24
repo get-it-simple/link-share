@@ -1,4 +1,4 @@
-# Links Share Storage - [live demo](https://weirdo-11.github.io/link-share/)
+# Links Share Storage - [live demo](https://get-it-simple.github.io/link-share/)
 
 React + TypeScript застосунок для локального збереження посилань у `localStorage`.
 
